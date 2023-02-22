@@ -1,3 +1,13 @@
+/**
+ * MediaStrim - A JavaScript lib For Web Artisans
+ * https://github.com/ohrimenko/mediastrim
+ *
+ * @package  mediastrim
+ * @author  ohrimenko <ohrimenko.dmitro@gmail.com>
+ *
+ * Copyright 2022 ohrimenko
+ * Released under the MIT license
+ */
 
 'use strict';
 
@@ -43,16 +53,16 @@ function MediaStrim(media, sources) {
     this.initMediaSource();
 }
 
-MediaStrim.startMediaSource = true; // Создавать MediaSource при создании объекта
-MediaStrim.ajaxType = "fetch"; // тип ajax запросов fetch or xhr
-MediaStrim.partTimeInterval = 1; // Групируем входной манифест по 1 секунде
-MediaStrim.loadTimeInterval = 15; // Подгружаем по 15 секунд.
-MediaStrim.loadTimeWaiting = 5; // Подгружаем по 1 секунде первые 5 секунд.
-MediaStrim.partRange = 3; // Режем на три части подгрузкуу буфера первые 5 секунд если входный манифест содержит данные с частотой более секунды.
-MediaStrim.loadSeekTime = 2000; // Запускаем виде через две секунды после перемотки если перемотка видео не завершена и не изменяется.
-MediaStrim.stopOtherVideo = true; // При воспроизведении видео останавливаем другие.
-MediaStrim.preLoadTime = 0.8; // Храним в кеше 1 секунду видео для еффекта мгновенного воспроизведения видео при нажатии на воспроизведения.
-MediaStrim.urlPreLoad = ""; // Ссылка для подгруки кеша буфера одним запросом для всех видео сразу.
+MediaStrim.startMediaSource = true; // Create MediaSource when object is created
+MediaStrim.ajaxType = "fetch"; // fetch or xhr ajax request type
+MediaStrim.partTimeInterval = 1; // Grouping the input manifest by 1 second
+MediaStrim.loadTimeInterval = 15; // We load for 15 seconds.
+MediaStrim.loadTimeWaiting = 5; // We load the first 5 seconds by 1 second.
+MediaStrim.partRange = 3; // We cut into three parts the buffer loading for the first 5 seconds if the input manifest contains data with a frequency of more than a second.
+MediaStrim.loadSeekTime = 2000; // We start the video two seconds after rewinding if the rewinding of the video is not completed and does not change.
+MediaStrim.stopOtherVideo = true; // When playing a video, stop others.
+MediaStrim.preLoadTime = 0.8; // We store 0.8 second of video in cache for the effect of instant video playback when you click on play.
+MediaStrim.urlPreLoad = ""; // Link to load the buffer cache with one request for all videos at once.
 
 MediaStrim.TimerId = null;
 MediaStrim.mediStreams = {};
