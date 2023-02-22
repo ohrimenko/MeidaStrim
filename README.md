@@ -6,13 +6,13 @@ It is a library for streaming video and audio. <br>
 To work, you need to convert video / audio from webm with a key frame rate of 1 second.<br>
 
 An example of converting via ffmpeg:<br>
-ffmpeg -i kyiv.mp4 -force_key_frames expr:gte(t,n_forced*1) -c:v libvpx -b:v 1M -c:a libvorbis kyiv.webm<br>
+ffmpeg -i video.mp4 -force_key_frames expr:gte(t,n_forced*1) -c:v libvpx -b:v 1M -c:a libvorbis video.webm<br>
 
 Next, you need to remux the WebM file to meet the WebM Byte Stream requirements using the /bin/remuxer utility.<br>
-remuxer -cm=800 kyiv.webm kyiv.out.webm<br>
+remuxer -cm=800 video.webm video.out.webm<br>
 
 After you need to create a manifest of the received media file<br>
-manifest kyiv.out.webm > kyiv.out.webm.json<br><br>
+manifest video.out.webm > video.out.webm.json<br><br>
 
 Library for working with webm:<br><br>
 https://github.com/acolwell/mse-tools<br>
