@@ -45,7 +45,7 @@ $manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $media . ".js
       <tr>
         <td align="center" style="width: 100%;">
           <div class="div-media">
-            <audio class="media" controls="" onclick="alert('1')"></audio>
+            <audio class="media" controls=""></audio>
           </div>
         </td>
       </tr>

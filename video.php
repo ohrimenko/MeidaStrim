@@ -42,8 +42,8 @@ $manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $video . ".js
   </head>
   <body>
     <div class="div-video">
-      <video id="video" controls="" poster="<?= $video ?>.png"></video>
-      <video onclick="clickVideoSt(this)" onplay="clickVideoSt(this)" controls="" poster="<?= $video ?>.png" data-src="./<?= $video ?>?time=<?= time() ?>"></video>
+      <video id="video" controls="" poster="media/<?= $video ?>.png"></video>
+      <video onclick="clickVideoSt(this)" onplay="clickVideoSt(this)" controls="" poster="media/<?= $video ?>.png" data-src="media/<?= $video ?>?time=<?= time() ?>"></video>
     </div>
   </body>
 </html>

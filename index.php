@@ -52,7 +52,7 @@ $manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $media . ".js
       <tr>
         <td align="center" style="width: 100%;">
           <div class="div-media">
-            <video class="media" controls="" poster="<?= $media ?>.png"></video>
+            <video class="media" controls="" poster="media/<?= $media ?>.png"></video>
           </div>
         </td>
       </tr>
