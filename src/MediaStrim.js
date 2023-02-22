@@ -1,10 +1,10 @@
 
 'use strict';
 
-function MediaStrim(video, sources) {
+function MediaStrim(media, sources) {
     var $this = this;
     
-    this.media = video;
+    this.media = media;
     this.sources = sources;
     
     this.sources.sort(function (a, b) {
