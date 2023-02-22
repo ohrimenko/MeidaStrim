@@ -37,3 +37,6 @@ Initialization example:<br>
 MediaStrim.urlPreLoad = "preload.php";<br>
 // Next, we call the load<br>
 MediaStrim.preLoad();<br>
+
+
+The MeidaStream lib is open-sourced software licensed under the MIT license.
