@@ -28,7 +28,7 @@ Initialization example:<br>
 (new MediaStream(media, [<br>
      {<br>
          url: "media/kyiv.webm",<br>
-         manifest: JSON.parse(atob("<?= base64_encode(json_encode($manifest)) ?>"))<br>
+         manifest: JSON.parse(atob("manifest_string_json"))<br>
      }<br>
 ]));<br>
 
