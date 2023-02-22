@@ -17,7 +17,7 @@ manifest video.out.webm > video.out.webm.json<br><br>
 Library for working with webm:<br><br>
 https://github.com/acolwell/mse-tools<br>
 
-Examples of using:
+Examples of using:<br>
 index.php - playing video list<br>
 video.php - play one video<br>
 audio.php - audio<br>
