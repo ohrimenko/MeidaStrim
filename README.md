@@ -8,7 +8,7 @@ To work, you need to convert video / audio from webm with a key frame rate of 1 
 An example of converting via ffmpeg:<br>
 ffmpeg -i kyiv.mp4 -force_key_frames expr:gte(t,n_forced*1) -c:v libvpx -b:v 1M -c:a libvorbis kyiv.webm<br>
 
-Next, you need to remux the WebM file to meet the WebM Byte Stream requirements using the /bin/remuxer<br> utility.
+Next, you need to remux the WebM file to meet the WebM Byte Stream requirements using the /bin/remuxer utility.<br>
 remuxer -cm=800 kyiv.webm kyiv.out.webm<br>
 
 After you need to create a manifest of the received media file<br>
