@@ -12,7 +12,8 @@ Next, you need to remux the WebM file to meet the WebM Byte Stream requirements 
 remuxer -cm=800 video.webm video.out.webm<br>
 
 After you need to create a manifest of the received media file<br>
-manifest video.out.webm > video.out.webm.json<br><br>
+./bin/manifest ./media/kyiv.webm > ./manifest/kyiv.webm.json<br>
+./bin/manifest ./media/audio.webm > ./manifest/audio.webm.json<br><br>
 
 Library for working with webm:<br><br>
 https://github.com/acolwell/mse-tools<br>
@@ -28,15 +29,15 @@ Initialization example:<br>
 (new MediaStream(media, [<br>
      {<br>
          url: "media/kyiv.webm",<br>
-         manifest: JSON.parse(atob("manifest_string_json"))<br>
+         manifest: JSON.parse(atob("<?= base64_encode(json_encode($manifest)) ?>"))<br>
      }<br>
 ]));<br>
 
 // To load the buffer of all videos. In the list of videos, one request for one second from each video. <br>
 // This creates the effect of instant video playback even on long requests.<br>
-MediaStrim.urlPreLoad = "preload.php";<br>
+MediaData.urlPreLoad = "preload.php";<br>
 // Next, we call the load<br>
-MediaStrim.preLoad();<br>
+MediaData.preLoad();<br>
 
 
 The MeidaStream lib is open-sourced software licensed under the MIT license.

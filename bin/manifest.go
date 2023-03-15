@@ -30,6 +30,8 @@ import (
 	"github.com/acolwell/mse-tools/webm"
 )
 
+var sizeIn int64 = 0
+
 type isobmffClient struct {
 	foundInitSegment   bool
 	mediaSegmentOffset int64
@@ -76,11 +78,15 @@ func (c *isobmffClient) OnElementEnd(offset int64, id string) bool {
 		c.foundInitSegment = true
 		c.manifest.Init = &InitSegment{Offset: 0, Size: offset}
 	} else if id == "mdat" {
-		c.manifest.Media = append(c.manifest.Media, &MediaSegment{
-			Offset:   c.mediaSegmentOffset,
-			Size:     (offset - c.mediaSegmentOffset),
-			Timecode: float64(-1),
-		})
+		/*
+			c.manifest.Media = append(c.manifest.Media, &MediaSegment{
+				Offset:   c.mediaSegmentOffset,
+				Size:     (offset - c.mediaSegmentOffset),
+				Timecode: float64(-1),
+			})
+		*/
+
+		infoOut(fmt.Sprintf("%d,%.3f", c.mediaSegmentOffset, float64(-1)), "media")
 
 		c.mediaSegmentOffset = -1
 	}
@@ -115,6 +121,7 @@ type MediaSegment struct {
 }
 
 type JSONManifest struct {
+	Size      uint64
 	Type      string
 	Width     uint64
 	Height    uint64
@@ -128,6 +135,7 @@ type JSONManifest struct {
 func (jm *JSONManifest) ToJSON() string {
 	str := "{"
 	str += "\"type\": \"" + strings.Replace(jm.Type, "\"", "\\\"", -1) + "\","
+	str += fmt.Sprintf("\"size\": %d,", sizeIn)
 
 	if jm.Width > 0 && jm.Height > 0 {
 		str += fmt.Sprintf("\"width\": %d,", jm.Width)
@@ -154,9 +162,9 @@ func (jm *JSONManifest) ToJSON() string {
 	str += "\"media\": ["
 	for i := range jm.Media {
 		m := jm.Media[i]
-		str += fmt.Sprintf("[%d,%d,%.3f]",
+		str += fmt.Sprintf("[%d,%.3f]",
 			m.Offset,
-			m.Size,
+			//m.Size,
 			m.Timecode)
 		if i+1 != len(jm.Media) {
 			str += ","
@@ -208,7 +216,31 @@ func (c *webMClient) OnListStart(offset int64, id int) bool {
 	} else if id == webm.IdCluster {
 		if c.headerSize == -1 {
 			c.headerSize = offset - c.headerOffset
+
+			infoOut("type:"+c.manifest.Type, "stat")
+			infoOut(fmt.Sprintf("size:%d", sizeIn), "stat")
+			if c.manifest.Width > 0 {
+				infoOut(fmt.Sprintf("width:%d", c.manifest.Width), "stat")
+			}
+			if c.manifest.Height > 0 {
+				infoOut(fmt.Sprintf("height:%d", c.manifest.Height), "stat")
+			}
+			if c.manifest.Duration == -1 {
+				infoOut("live:true", "stat")
+			} else {
+				infoOut(fmt.Sprintf("duration:%.3f", c.manifest.Duration), "stat")
+			}
+
+			if !c.manifest.StartDate.IsZero() {
+				infoOut("startDate:"+c.manifest.StartDate.Format(time.RFC3339Nano), "stat")
+			}
+
 			c.manifest.Init = &InitSegment{Offset: c.headerOffset, Size: c.headerSize}
+
+			infoOut(fmt.Sprintf("init:%d,%d", c.manifest.Init.Offset, c.manifest.Init.Size), "init")
+
+			infoOut("", "media")
+			infoOut("", "media")
 		}
 		c.clusterOffset = offset
 	}
@@ -240,20 +272,25 @@ func (c *webMClient) OnListEnd(offset int64, id int) bool {
 		}
 
 		c.manifest.Type = contentType
+
 		return true
 	}
 
 	if id == webm.IdCluster {
-		c.manifest.Media = append(c.manifest.Media, &MediaSegment{
-			Offset:   c.clusterOffset,
-			Size:     (offset - c.clusterOffset),
-			Timecode: (float64(c.clusterTimecode) * scaleMult),
-		})
+		/*
+			c.manifest.Media = append(c.manifest.Media, &MediaSegment{
+				Offset:   c.clusterOffset,
+				Size:     (offset - c.clusterOffset),
+				Timecode: (float64(c.clusterTimecode) * scaleMult),
+			})
+		*/
+
+		infoOut(fmt.Sprintf("%d,%.3f", c.clusterOffset, (float64(c.clusterTimecode)*scaleMult)), "media")
 		return true
 	}
 
 	if id == webm.IdSegment {
-		fmt.Printf(c.manifest.ToJSON())
+		//fmt.Printf(c.manifest.ToJSON())
 	}
 	return true
 }
@@ -341,6 +378,25 @@ func NewWebMParser() *ebml.Parser {
 		ebml.NewElementParser(c, webm.IdTypes()))
 }
 
+var isStat bool = false
+var isInit bool = false
+var isMedia bool = false
+
+func infoOut(str string, tn string) {
+	if tn == "stat" && !isInit && !isMedia {
+		isStat = true
+		fmt.Print(str + "\n")
+	}
+	if tn == "init" && !isInit && !isMedia {
+		isInit = true
+		fmt.Print(str + "\n")
+	}
+	if tn == "media" && isStat && isInit {
+		isMedia = true
+		fmt.Print(str + "\n")
+	}
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <infile>\n", os.Args[0])
@@ -348,26 +404,43 @@ func main() {
 	}
 
 	var in io.Reader = nil
-	var err error = nil
 
 	if os.Args[1] == "-" {
 		in = os.Stdin
-	} else if strings.HasPrefix(os.Args[1], "http://") {
+	} else if strings.HasPrefix(os.Args[1], "http://") || strings.HasPrefix(os.Args[1], "https://") {
 		resp, err := http.Get(os.Args[1])
 		if err != nil {
 			log.Printf("can't open url; err=%s\n", err.Error())
 			os.Exit(1)
 		}
 		in = resp.Body
+		sizeIn = resp.ContentLength
 	} else {
-		in, err = os.Open(os.Args[1])
-		if in == nil {
+		f, err := os.Open(os.Args[1])
+
+		if f == nil {
 			log.Printf("can't open file; err=%s\n", err.Error())
 			os.Exit(1)
 		}
+
+		fi, err := f.Stat()
+		if err != nil {
+			log.Printf("Stat; err=%s\n", err.Error())
+			os.Exit(1)
+		}
+
+		sizeIn = fi.Size()
+
+		in = f
 	}
 
 	buf := [4096]byte{}
+
+	isSize := false
+
+	if sizeIn == 0 {
+		isSize = true
+	}
 
 	var parser Parser = nil
 	for done := false; !done; {
@@ -375,6 +448,10 @@ func main() {
 		if err == io.EOF || err == io.ErrClosedPipe {
 			done = true
 			continue
+		}
+
+		if isSize {
+			sizeIn += int64(bytesRead)
 		}
 
 		if parser == nil {

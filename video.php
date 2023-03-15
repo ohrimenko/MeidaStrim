@@ -2,7 +2,7 @@
 
 $video = "kyiv.webm";
 
-$manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $video . ".json"), true);
+$manifest = file_get_contents(__dir__ . "/manifest/" . $video . ".mnf");
 
 //echo "<pre>";print_r($videoinfo);exit;
 
@@ -38,7 +38,7 @@ $manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $video . ".js
     }
     </style>
     
-    <script type="text/javascript" src="src/MediaStrim.js?time=<?= time() ?>"> </script>
+    <script type="text/javascript" src="src/MediaData.js?time=<?= time() ?>"> </script>
   </head>
   <body>
     <div class="div-video">
@@ -56,38 +56,38 @@ function clickVideoSt(obj) {
     }
 }
 
-var objMediaStrim = new MediaStrim(document.getElementById('video'), [
+var objMediaData = new MediaData(document.getElementById('video'), [
     {
         url: "media/<?= $video ?>?time=<?= time() ?>",
-        manifest: JSON.parse(atob("<?= base64_encode(json_encode($manifest)) ?>"))
+        manifest: JSON.parse(atob("<?= str_replace(["\n", '"'], ['\n', '\"'], $manifest) ?>"))
     }
 ]);
 
-objMediaStrim.play();
-//objMediaStrim.start(true); 
+objMediaData.play();
+//objMediaData.start(true); 
 
-//objMediaStrim.preLoad(function () {});
+//objMediaData.preLoad(function () {});
 
 setInterval(function () {
     return;
     
-    objMediaStrim.reinit();
+    objMediaData.reinit();
 }, 3000);
 
 setInterval(function () {
     return;
     
-    objMediaStrim.play(60);
+    objMediaData.play(60);
 }, 10000);
 
 setInterval(function () {
     return;
             
-    if (objMediaStrim.sKey == objMediaStrim.sKeyInit) {
-        if (objMediaStrim.sKey == 0) {
-            objMediaStrim.sKey = 1;
+    if (objMediaData.sKey == objMediaData.sKeyInit) {
+        if (objMediaData.sKey == 0) {
+            objMediaData.sKey = 1;
         } else {
-            objMediaStrim.sKey = 0;
+            objMediaData.sKey = 0;
         }
     }
 }, 100);
@@ -95,12 +95,12 @@ setInterval(function () {
 setInterval(function () {
     return;
             
-    //objMediaStrim.reinit();
-    //objMediaStrim.play(60);
-    if (objMediaStrim.isPlay) {
-        objMediaStrim.stop(true);
+    //objMediaData.reinit();
+    //objMediaData.play(60);
+    if (objMediaData.isPlay) {
+        objMediaData.stop(true);
     } else {
-        objMediaStrim.play();
+        objMediaData.play();
     }
 }, 10000);
 </script>

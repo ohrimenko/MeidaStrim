@@ -2,6 +2,8 @@
 
 //print_r($_POST);exit;
 
+//ini_set('zlib.output_compression', 1);
+
 if (isset($_POST['items']) && is_array($_POST['items'])) {
     foreach ($_POST['items'] as $item) {
         $purl = parse_url($item['url']);

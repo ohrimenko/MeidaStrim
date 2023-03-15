@@ -2,7 +2,7 @@
 
 $media = "kyiv.webm";
 
-$manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $media . ".json"), true);
+$manifest = file_get_contents(__dir__ . "/manifest/" . $media . ".mnf");
 
 //echo "<pre>";print_r($mediainfo);exit;
 
@@ -44,7 +44,7 @@ $manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $media . ".js
     }
     </style>
     
-    <script type="text/javascript" src="src/MediaStrim.js?time=<?= time() ?>"> </script>
+    <script type="text/javascript" src="src/MediaData.js?time=<?= time() ?>"> </script>
   </head>
   <body>
     <table id="listmedia" class="display_none" style="width: 100%;">
@@ -70,17 +70,17 @@ $manifest = json_decode(file_get_contents(__dir__ . "/manifest/" . $media . ".js
 <script>
 
 document.querySelectorAll(".div-media > .media").forEach((media) => {
-    (new MediaStrim(media, [
+    (new MediaData(media, [
         {
-            url: "media/<?= $media ?>?time=<?= time() ?>&str=" + MediaStrim.randomString(5),
-            manifest: JSON.parse(atob("<?= base64_encode(json_encode($manifest)) ?>"))
+            url: "media/<?= $media ?>?time=<?= time() ?>&str=" + MediaData.randomString(5),
+            manifest: "<?= str_replace(["\n", '"'], ['\n', '\"'], $manifest) ?>"
         }
     ]));
 });
 
-MediaStrim.urlPreLoad = "preload.php";
+MediaData.urlPreLoad = "preload.php";
 
-MediaStrim.preLoad(function(){
+MediaData.preLoad(function(){
     document.addEventListener('scroll', windowScroll);
     document.querySelector('body').addEventListener('scroll', windowScroll);
     
